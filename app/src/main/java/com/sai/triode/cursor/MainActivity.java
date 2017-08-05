@@ -50,10 +50,10 @@ public class MainActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                String s=artList.get(i);
+                String s=arrayList.get(i);
                 String s1="",s2="";
                 int flag=0;
-                for(int j=0;j<s.length();j++)
+                for(int j=7;j<s.length();j++)
                 {
                     if(flag==1)
                         s1+=s.charAt(j);
@@ -63,8 +63,16 @@ public class MainActivity extends AppCompatActivity {
                     if(s.charAt(j)=='$')
                         flag=1;
                 }
-                Toast.makeText(getApplicationContext(),s2,Toast.LENGTH_LONG).show();
-                Bitmap bm= BitmapFactory.decodeFile(s1);
+                s2=s2.substring(0,s2.length()-1);
+                Toast.makeText(getApplicationContext(),s2,Toast.LENGTH_SHORT).show();
+                ContentResolver contentResolver=getContentResolver();
+                Uri uri= MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI;
+                Cursor cursor=contentResolver.query(uri,new String[]{MediaStore.Audio.Albums.ALBUM,
+                        MediaStore.Audio.Albums.ALBUM_ART},"album=?",new String[]{s2},null);
+                cursor.moveToFirst();
+                int col=cursor.getColumnIndexOrThrow(MediaStore.Audio.Albums.ALBUM_ART);
+                String s3=cursor.getString(col);
+                Bitmap bm= BitmapFactory.decodeFile(/*s1*/s3);
                 ImageView image=(ImageView)findViewById(R.id.img);
                 image.setScaleType(ImageView.ScaleType.CENTER_CROP);
                 image.setImageBitmap(bm);
@@ -120,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
                 String CTr=songCursor.getString(songTrack);
 
                 if(!cAlbum.equals(preAlbum)) {
-                    arrayList.add("Album: " + cAlbum + "\nTitle: " + currentTitle + "\nArtist: " + currentArtist + "\nBookmark: " + cBk + "\nYear: " + cY + "\nData: " +
+                    arrayList.add("Album: " + cAlbum + "$\nTitle: " + currentTitle + "\nArtist: " + currentArtist + "\nBookmark: " + cBk + "\nYear: " + cY + "\nData: " +
                             cDa + "\nDate Added: " + cDaA + "\nDisplay name: " + cDiN + "\nDuration: " + cDu + "\nTrack: " + CTr + "\nISMusic: " + cIM);
                     preAlbum = cAlbum;
                 }
